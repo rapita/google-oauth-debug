@@ -6,7 +6,7 @@ This repository contains simple web server for receiving callback by google oaut
 
 Make code:
 ```shell
-
+git clone git@github.com:rapita/google-oauth-debug.git && cd google-oauth-debug
 ```
 
 Install modules:
