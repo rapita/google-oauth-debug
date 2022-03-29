@@ -1,0 +1,6 @@
+port: 8080
+client_id: some-id
+client_secret: some-secret
+callback_route: /callback
+scopes:
+  - https://www.googleapis.com/auth/userinfo.email
