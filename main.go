@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"github.com/knadh/koanf"
 	"github.com/knadh/koanf/parsers/yaml"
@@ -24,6 +25,13 @@ var (
 		Endpoint:     google.Endpoint,
 	}
 )
+
+type TokenFormatted struct {
+	AccessToken  string `json:"access_token"`
+	TokenType    string `json:"token_type,omitempty"`
+	RefreshToken string `json:"refresh_token,omitempty"`
+	Expiry       int64  `json:"expires_in,omitempty"`
+}
 
 func initOauth() {
 	oauthConf.ClientID = k.String("client_id")
@@ -84,14 +92,19 @@ func handleCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token, err := oauthConf.Exchange(oauth2.NoContext, code)
+	token, err := oauthConf.Exchange(context.Background(), code)
 	if err != nil {
 		log.Println("oauthConf.Exchange() failed with " + err.Error() + "\n")
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 		return
 	}
 
-	jsonToken, err := json.Marshal(token)
+	jsonToken, err := json.Marshal(TokenFormatted{
+		AccessToken:  token.AccessToken,
+		RefreshToken: token.RefreshToken,
+		TokenType:    token.TokenType,
+		Expiry:       token.Expiry.Unix(),
+	})
 	if err != nil {
 		log.Fatalf("Error happened in JSON marshal. Err: %s", err)
 	}
