@@ -15,7 +15,7 @@ import (
 
 // Global koanf instance. Use "." as the key path delimiter. This can be "/" or any character.
 var (
-	k = koanf.New(".")
+	k         = koanf.New(".")
 	oauthConf = &oauth2.Config{
 		ClientID:     "",
 		ClientSecret: "",
@@ -91,25 +91,15 @@ func handleCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Println("TOKEN>> AccessToken>> " + token.AccessToken)
-	log.Println("TOKEN>> Expiration Time>> " + token.Expiry.String())
-	log.Println("TOKEN>> RefreshToken>> " + token.RefreshToken)
-
-	result := make(map[string]string)
-	result["token_type"] = token.TokenType
-	result["access_token"] = token.AccessToken
-	result["refresh_token"] = token.RefreshToken
-	result["expiry"] = token.Expiry.String()
-
-	jsonResp, err := json.Marshal(result)
+	jsonToken, err := json.Marshal(token)
 	if err != nil {
 		log.Fatalf("Error happened in JSON marshal. Err: %s", err)
 	}
 
-	log.Println("parseResponseBody: " + string(jsonResp) + "\n")
+	log.Println("JSON Token: " + string(token.AccessToken))
 
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(jsonResp)
+	w.Write(jsonToken)
 	return
 }
 
