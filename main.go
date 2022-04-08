@@ -10,8 +10,6 @@ import (
 	"golang.org/x/oauth2/google"
 	"log"
 	"net/http"
-	"net/url"
-	"strings"
 )
 
 // Global koanf instance. Use "." as the key path delimiter. This can be "/" or any character.
@@ -58,18 +56,8 @@ func handleHome(w http.ResponseWriter, r *http.Request) {
 
 func handleLogin(w http.ResponseWriter, r *http.Request) {
 	log.Println("Request: " + r.URL.String())
-	URL, err := url.Parse(oauthConf.Endpoint.AuthURL)
-	if err != nil {
-		log.Fatal("parse: " + err.Error())
-	}
 
-	parameters := url.Values{}
-	parameters.Add("client_id", oauthConf.ClientID)
-	parameters.Add("scope", strings.Join(oauthConf.Scopes, " "))
-	parameters.Add("redirect_uri", oauthConf.RedirectURL)
-	parameters.Add("response_type", "code")
-	URL.RawQuery = parameters.Encode()
-	redirectUrl := URL.String()
+	redirectUrl := oauthConf.AuthCodeURL("", oauth2.AccessTypeOffline)
 
 	log.Println("Redirect: " + redirectUrl)
 
